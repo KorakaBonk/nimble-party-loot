@@ -1,6 +1,6 @@
 # Nimble Party Loot
 
-A shared party-loot stash for the [Nimble 2](https://github.com/Nimble-Co/FoundryVTT-Nimble) system on Foundry VTT v13. Players drag items and coins out of their own character and into a common pool; anyone can take them back out. Every transfer is reconciled against the real inventories and purses involved.
+A shared party-loot stash for the [Nimble 2](https://github.com/Nimble-Co/FoundryVTT-Nimble) system (0.10.0 or newer) on Foundry VTT v14. Players drag items and coins out of their own character and into a common pool; anyone can take them back out. Every transfer is reconciled against the real inventories and purses involved.
 
 Built with Svelte 5 + Vite + TypeScript to mirror the Nimble system's own stack, and styled with the system's `--nimble-*` design tokens so it reads as native.
 

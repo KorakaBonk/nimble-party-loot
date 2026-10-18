@@ -31,7 +31,7 @@ export default class PartyLootApp extends SvelteApplicationMixin(ApplicationV2) 
 			return PartyLootApp.#instance;
 		}
 		PartyLootApp.#instance = new PartyLootApp();
-		PartyLootApp.#instance.render(true);
+		PartyLootApp.#instance.render({ force: true });
 		return PartyLootApp.#instance;
 	}
 
@@ -40,7 +40,7 @@ export default class PartyLootApp extends SvelteApplicationMixin(ApplicationV2) 
 		else PartyLootApp.show();
 	}
 
-	override _onClose(options: any): void {
+	_onClose(options: any): void {
 		super._onClose(options);
 		if (PartyLootApp.#instance === this) PartyLootApp.#instance = null;
 	}

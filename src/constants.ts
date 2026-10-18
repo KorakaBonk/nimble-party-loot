@@ -20,5 +20,8 @@ export type Denomination = (typeof DENOMINATIONS)[number];
 /** Drag-data type set on a loot row so actor-sheet drops can be intercepted for withdrawal. */
 export const DRAG_TYPE_WITHDRAW = 'NimblePartyLoot';
 
+/** The `objectSizeType` values the Nimble object data model accepts (validated since 0.10). */
+export const OBJECT_SIZE_TYPES: readonly string[] = ['slots', 'stackable', 'smallSized'];
+
 /** Object-type grouping order, mirroring the Nimble character sheet inventory tab. */
 export const OBJECT_TYPE_ORDER = ['weapon', 'armor', 'shield', 'consumable', 'misc'] as const;

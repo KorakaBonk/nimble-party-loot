@@ -2,11 +2,11 @@
 	"id": "nimble-party-loot",
 	"title": "Nimble Party Loot",
 	"description": "A shared party loot stash for the Nimble 2 system. Players drag items and coins out of their own inventory into a common pool, and anyone can take them back out — all transfers reconciled against each character's real inventory and purse.",
-	"version": "1.2.0",
+	"version": "2.0.0",
 	"compatibility": {
-		"minimum": "13",
-		"verified": "13",
-		"maximum": "13"
+		"minimum": "14",
+		"verified": "14.365",
+		"maximum": "14"
 	},
 	"relationships": {
 		"systems": [
@@ -14,8 +14,8 @@
 				"id": "nimble",
 				"type": "system",
 				"compatibility": {
-					"minimum": "0.8.0",
-					"verified": "0.8.6"
+					"minimum": "0.10.0",
+					"verified": "0.10.0"
 				}
 			}
 		]
