@@ -40,8 +40,9 @@ Hooks.once('ready', () => {
 });
 
 /**
- * Add a togglable control button to the Token tools group (visible to all
- * users, including players). Written for the Foundry v13 record-style controls.
+ * Add a control button to the Token tools group (visible to all users,
+ * including players). Uses the record-style controls introduced in v13 and kept
+ * in v14; button tools only fire `onChange` (the old `onClick` is gone).
  */
 Hooks.on('getSceneControlButtons', (controls: any) => {
 	const group = controls.tokens ?? controls.token;
@@ -54,28 +55,55 @@ Hooks.on('getSceneControlButtons', (controls: any) => {
 		visible: true,
 		order: 99,
 		onChange: () => PartyLootApp.toggle(),
-		onClick: () => PartyLootApp.toggle(),
 	};
 });
 
 /**
- * Intercept loot rows dropped onto a character sheet so they are withdrawn
- * (atomically removed from the pool and created on that actor) instead of the
- * system trying to handle an unknown drop type. Returning false cancels the
- * system's default drop handling. Drag-to-sheet takes the whole stack; use the
- * in-window "Take" button for partial quantities.
+ * Withdraw a loot row dropped onto an actor sheet: it is atomically removed
+ * from the pool and created on that actor. Drag-to-sheet takes the whole stack;
+ * use the in-window "Take" button for partial quantities.
  */
-Hooks.on('dropActorSheetData', (actor: any, _sheet: any, data: any) => {
-	if (!data || data.type !== DRAG_TYPE_WITHDRAW) return true;
+function withdrawDroppedEntry(actor: any, data: any): void {
 	const entry = lootStore.items.find((e) => e.entryId === data.entryId);
 	if (!entry) {
 		ui.notifications.warn('That item is no longer in the stash.');
-		return false;
+		return;
 	}
 	if (!actor?.testUserPermission(game.user, 'OWNER') || actor.type !== 'character') {
 		ui.notifications.warn('You can only take loot into a character you own.');
-		return false;
+		return;
 	}
 	void withdrawItem(entry, actor.id, entry.quantity);
+}
+
+/**
+ * Catch loot rows on their way into any actor sheet, before the sheet's own
+ * handlers see them. Nimble 0.10's inventory rows handle every drop themselves
+ * (moving items in and out of containers) and stop it there, so a row dropped
+ * onto an existing item would never reach `dropActorSheetData`.
+ */
+Hooks.on('renderActorSheetV2', (sheet: any, element: HTMLElement) => {
+	if (!element || element.dataset.nplDropBound) return;
+	element.dataset.nplDropBound = 'true';
+	element.addEventListener(
+		'drop',
+		(event: DragEvent) => {
+			const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
+			if (!data || data.type !== DRAG_TYPE_WITHDRAW) return;
+			event.preventDefault();
+			event.stopPropagation();
+			withdrawDroppedEntry(sheet.actor ?? sheet.document, data);
+		},
+		{ capture: true },
+	);
+});
+
+/**
+ * Fallback for sheets that are not ActorSheetV2 subclasses but still run the
+ * core drop hook. Returning false cancels the sheet's default drop handling.
+ */
+Hooks.on('dropActorSheetData', (actor: any, _sheet: any, data: any) => {
+	if (!data || data.type !== DRAG_TYPE_WITHDRAW) return true;
+	withdrawDroppedEntry(actor, data);
 	return false;
 });

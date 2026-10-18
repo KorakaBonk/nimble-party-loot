@@ -1,6 +1,6 @@
 import { LOOT_ITEM_TYPE } from '../constants.js';
 import { getCoin } from '../lib/actors.js';
-import { entryFromItem } from '../lib/lootHelpers.js';
+import { cleanObjectSource, entryFromItem } from '../lib/lootHelpers.js';
 import { readStore, writeStore } from '../settings.js';
 import type {
 	AdjustCurrencyPayload,
@@ -72,8 +72,7 @@ export async function execWithdrawItem(
 	if (qty <= 0) return fail('Nothing to withdraw.');
 
 	// Recreate the item on the receiving actor with the withdrawn quantity.
-	const source = foundry.utils.deepClone(entry.source);
-	source._id = null;
+	const source = cleanObjectSource(foundry.utils.deepClone(entry.source));
 	if (source.system) source.system.quantity = qty;
 	await actor.createEmbeddedDocuments('Item', [source]);
 
