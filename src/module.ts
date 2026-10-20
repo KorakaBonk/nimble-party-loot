@@ -1,4 +1,5 @@
 import './styles.js';
+import { createApi } from './api.js';
 import PartyLootApp from './apps/PartyLootApp.svelte.js';
 import { DRAG_TYPE_WITHDRAW, MODULE_ID } from './constants.js';
 import { isNimble } from './lib/actors.js';
@@ -21,13 +22,7 @@ Hooks.once('init', () => {
 	});
 
 	const mod = game.modules.get(MODULE_ID);
-	if (mod) {
-		mod.api = {
-			open: () => PartyLootApp.show(),
-			toggle: () => PartyLootApp.toggle(),
-			app: PartyLootApp,
-		};
-	}
+	if (mod) mod.api = createApi();
 });
 
 Hooks.once('ready', () => {

@@ -31,3 +31,16 @@ GMs execute their own actions directly and can deposit from any sheet (including
 
 - **Add items from any source.** As GM, drag an item from the **Items sidebar** or a **compendium pack** onto the window. Since there's no owning character, nothing is removed — a copy is added to the pool, and you're asked how many. (Players can still only deposit from a character they own.)
 - **Mint coins with no source.** The currency bar has a GM-only "add coins (no source)" panel: enter gp/sp/cp and click **Add** to drop a hoard straight into the stash. Negative values subtract, so it doubles as a correction tool.
+
+## API for other modules
+
+`game.modules.get('nimble-party-loot').api` offers:
+
+| Call | What it does |
+| --- | --- |
+| `version` | `1`. Check it before using the calls below. |
+| `open()` / `toggle()` | Open or toggle the party loot window. |
+| `addItem(itemOrUuid, { quantity, depositedBy })` | Add a copy of a Nimble object (a document or its uuid) to the stash. `quantity` defaults to the item's own quantity, `depositedBy` to the current user's name. Stackables merge as usual. Nothing is removed from the item's owner. |
+| `addCoins({ gp, sp, cp })` | Add coins to the stash. Missing or negative amounts count as zero. |
+
+`addItem` and `addCoins` must run on a GM client, since the stash is a world setting. Both resolve to `{ ok: true }` or `{ ok: false, error }`.
