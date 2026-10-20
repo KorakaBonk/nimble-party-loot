@@ -7,6 +7,7 @@ import type {
 	DepositItemPayload,
 	DepositItemSourcePayload,
 	LogEntry,
+	LootEntry,
 	LootStore,
 	MultiCurrencyPayload,
 	SpendPayload,
@@ -40,11 +41,7 @@ export async function execDepositItem(
 	const entry = entryFromItem(item, qty, user.name);
 
 	// Merge into an existing stackable entry with an identical signature.
-	const existing = entry.stackable
-		? store.items.find((e) => e.stackable && e.signature === entry.signature)
-		: undefined;
-	if (existing) existing.quantity += qty;
-	else store.items.push(entry);
+	addEntry(store, entry);
 
 	// Remove the deposited count from the source actor.
 	if (qty >= held) await actor.deleteEmbeddedDocuments('Item', [item.id]);
@@ -220,11 +217,7 @@ export async function execDepositItemSource(
 	const store = readStore();
 	const entry = entryFromItem(item, qty, user.name);
 
-	const existing = entry.stackable
-		? store.items.find((e) => e.stackable && e.signature === entry.signature)
-		: undefined;
-	if (existing) existing.quantity += qty;
-	else store.items.push(entry);
+	addEntry(store, entry);
 
 	await writeStore(store);
 	return ok();
@@ -253,6 +246,15 @@ export async function execAdjustCurrency(
 
 	await writeStore(store);
 	return ok();
+}
+
+/** Put an entry into the store, merging it into an identical stackable entry. */
+export function addEntry(store: LootStore, entry: LootEntry): void {
+	const existing = entry.stackable
+		? store.items.find((e) => e.stackable && e.signature === entry.signature)
+		: undefined;
+	if (existing) existing.quantity += entry.quantity;
+	else store.items.push(entry);
 }
 
 function clampInt(value: number, min: number, max: number): number {
