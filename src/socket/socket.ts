@@ -49,7 +49,7 @@ function onSocketMessage(message: LootRequest | LootResponse): void {
 		if (!entry) return;
 		window.clearTimeout(entry.timer);
 		pending.delete(message.requestId);
-		entry.resolve({ ok: message.ok, error: message.error });
+		entry.resolve({ ok: message.ok, error: message.error, data: message.data });
 	}
 }
 
@@ -61,6 +61,7 @@ async function handleRequestAsGM(request: LootRequest): Promise<void> {
 		toUserId: request.userId,
 		ok: result.ok,
 		error: result.error,
+		data: result.data,
 	};
 	game.socket.emit(SOCKET_NAME, response);
 }

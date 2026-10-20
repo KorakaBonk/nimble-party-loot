@@ -10,6 +10,9 @@ export const SOCKET_NAME = `module.${MODULE_ID}`;
 /** World-scoped setting key holding the entire shared loot store (items + coins). */
 export const SETTING_STORE = 'lootStore';
 
+/** Client-scoped setting: whether this user sees the party loot chat cards. */
+export const SETTING_CHAT_CARDS = 'chatCards';
+
 /** Item document type in Nimble that represents physical inventory ("objects"). */
 export const LOOT_ITEM_TYPE = 'object';
 

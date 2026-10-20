@@ -1,9 +1,10 @@
 import { LOOT_ITEM_TYPE } from '../constants.js';
 import { getCoin } from '../lib/actors.js';
-import { cleanObjectSource, entryFromItem } from '../lib/lootHelpers.js';
+import { cleanObjectSource, displayName, entryFromItem } from '../lib/lootHelpers.js';
 import { readStore, writeStore } from '../settings.js';
 import type {
 	AdjustCurrencyPayload,
+	ChatData,
 	DepositItemPayload,
 	DepositItemSourcePayload,
 	LogEntry,
@@ -17,6 +18,8 @@ import type {
 export interface TxResult {
 	ok: boolean;
 	error?: string;
+	/** What actually moved (after clamping), for the chat card the requester posts. */
+	data?: ChatData;
 }
 
 /** These run ONLY on a GM client. The requesting user is resolved for permission checks. */
@@ -48,7 +51,7 @@ export async function execDepositItem(
 	else await item.update({ 'system.quantity': held - qty });
 
 	await writeStore(store);
-	return ok();
+	return ok({ ...itemData(entry, qty), actorId: actor.id, characterName: actor.name });
 }
 
 export async function execWithdrawItem(
@@ -78,7 +81,7 @@ export async function execWithdrawItem(
 	else entry.quantity -= qty;
 
 	await writeStore(store);
-	return ok();
+	return ok({ ...itemData(entry, qty), actorId: actor.id, characterName: actor.name });
 }
 
 export async function execDepositCurrency(
@@ -108,7 +111,7 @@ export async function execDepositCurrency(
 
 	await actor.update(update);
 	await writeStore(store);
-	return ok();
+	return ok({ actorId: actor.id, characterName: actor.name, coins: move });
 }
 
 export async function execWithdrawCurrency(
@@ -138,7 +141,7 @@ export async function execWithdrawCurrency(
 
 	await actor.update(update);
 	await writeStore(store);
-	return ok();
+	return ok({ actorId: actor.id, characterName: actor.name, coins: move });
 }
 
 /**
@@ -183,7 +186,7 @@ export async function execSpendCurrency(
 	if (store.log.length > 200) store.log.length = 200;
 
 	await writeStore(store);
-	return ok();
+	return ok({ characterName: entry.characterName, coins: spend, reason });
 }
 
 /** GM-only. Clear the spending ledger. */
@@ -191,9 +194,10 @@ export async function execClearLog(userId: string): Promise<TxResult> {
 	const user = game.users.get(userId);
 	if (!user?.isGM) return fail('Only a GM can clear the ledger.');
 	const store = readStore();
+	const count = store.log.length;
 	store.log = [];
 	await writeStore(store);
-	return ok();
+	return ok({ count });
 }
 
 /**
@@ -220,7 +224,7 @@ export async function execDepositItemSource(
 	addEntry(store, entry);
 
 	await writeStore(store);
-	return ok();
+	return ok(itemData(entry, qty));
 }
 
 /**
@@ -240,12 +244,18 @@ export async function execAdjustCurrency(
 	if (cp === 0 && sp === 0 && gp === 0) return fail('Enter an amount to add.');
 
 	const store = readStore();
-	store.currency.cp = Math.max(0, store.currency.cp + cp);
-	store.currency.sp = Math.max(0, store.currency.sp + sp);
-	store.currency.gp = Math.max(0, store.currency.gp + gp);
+	const added = { cp: 0, sp: 0, gp: 0 };
+	const removed = { cp: 0, sp: 0, gp: 0 };
+	const deltas = { cp, sp, gp };
+	for (const d of ['cp', 'sp', 'gp'] as const) {
+		const next = Math.max(0, store.currency[d] + deltas[d]);
+		if (next > store.currency[d]) added[d] = next - store.currency[d];
+		else removed[d] = store.currency[d] - next;
+		store.currency[d] = next;
+	}
 
 	await writeStore(store);
-	return ok();
+	return ok({ coins: added, removed });
 }
 
 /** Put an entry into the store, merging it into an identical stackable entry. */
@@ -262,8 +272,16 @@ function clampInt(value: number, min: number, max: number): number {
 	return Math.max(min, Math.min(max, n));
 }
 
-function ok(): TxResult {
-	return { ok: true };
+function ok(data?: ChatData): TxResult {
+	return { ok: true, data };
+}
+
+/**
+ * Describe an item for a chat card everyone can read, so an unidentified
+ * object keeps its secret there too.
+ */
+function itemData(entry: LootEntry, quantity: number): ChatData {
+	return { itemName: displayName(entry, false), img: entry.img, quantity };
 }
 
 function fail(error: string): TxResult {

@@ -2,6 +2,39 @@
 	"NIMBLE_PARTY_LOOT": {
 		"appTitle": "Party Loot",
 		"controlTitle": "Party Loot",
-		"keybindToggle": "Toggle Party Loot Window"
+		"keybindToggle": "Toggle Party Loot Window",
+		"settings": {
+			"chatCards": {
+				"name": "Show party loot in chat",
+				"hint": "Show a chat card whenever someone puts items or coins into the party loot, takes them out, or spends from it. This only changes what you see: every GM and player chooses for themselves."
+			}
+		},
+		"chat": {
+			"partyLoot": "Party loot",
+			"toLoot": "Into the party loot",
+			"fromLoot": "From the party loot",
+			"depositItem": "{character} put {item} into the party loot.",
+			"withdrawItem": "{character} took {item} from the party loot.",
+			"depositCoinsTitle": "Coins deposited",
+			"depositCoins": "{character} put coins into the party loot:",
+			"withdrawCoinsTitle": "Coins taken",
+			"withdrawCoins": "{character} took coins from the party loot:",
+			"spendTitle": "Coins spent",
+			"spendCoins": "{character} spent coins from the party loot on {reason}:",
+			"adjustTitle": "Party coins adjusted",
+			"clearLogTitle": "Ledger cleared",
+			"gm": {
+				"depositItem": "Gamemaster moved {item} from {character} into the party loot.",
+				"addItem": "Gamemaster added {item} to the party loot.",
+				"withdrawItem": "Gamemaster handed {item} to {character} from the party loot.",
+				"depositCoins": "Gamemaster moved coins from {character} into the party loot:",
+				"withdrawCoinsTitle": "Coins handed out",
+				"withdrawCoins": "Gamemaster handed coins to {character} from the party loot:",
+				"spendCoins": "Gamemaster spent coins from the party loot on {reason}:",
+				"addCoins": "Gamemaster added coins to the party loot:",
+				"removeCoins": "Gamemaster removed coins from the party loot:",
+				"clearLog": "Gamemaster cleared the spending ledger ({count} entries)."
+			}
+		}
 	}
 }

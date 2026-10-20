@@ -3,6 +3,7 @@ import { createApi } from './api.js';
 import PartyLootApp from './apps/PartyLootApp.svelte.js';
 import { DRAG_TYPE_WITHDRAW, MODULE_ID } from './constants.js';
 import { isNimble } from './lib/actors.js';
+import { applyChatCardVisibility, renderLootMessage } from './lib/chat.js';
 import { withdrawItem } from './lib/lootActions.js';
 import { registerSocket } from './socket/socket.js';
 import { lootStore } from './state/lootStore.svelte.js';
@@ -32,6 +33,11 @@ Hooks.once('ready', () => {
 	}
 	// Seed the reactive store from the persisted setting for this session.
 	lootStore.replace(readStore());
+	applyChatCardVisibility();
+});
+
+Hooks.on('renderChatMessageHTML', (message: any, html: HTMLElement) => {
+	if (isNimble()) renderLootMessage(message, html);
 });
 
 /**

@@ -97,6 +97,25 @@ export interface LootResponse {
 	toUserId: string;
 	ok: boolean;
 	error?: string;
+	data?: ChatData;
+}
+
+/**
+ * What a transaction actually did, sent back to the requester so it can post a
+ * chat card. Every field is optional; each action fills in the ones it needs.
+ */
+export interface ChatData {
+	actorId?: string;
+	characterName?: string | null;
+	itemName?: string;
+	img?: string;
+	quantity?: number;
+	coins?: CoinPurse;
+	/** Coins the GM took out of the pool with a negative adjustment. */
+	removed?: CoinPurse;
+	reason?: string;
+	/** How many ledger lines were cleared. */
+	count?: number;
 }
 
 export interface DepositItemPayload {

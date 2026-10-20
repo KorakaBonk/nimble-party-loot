@@ -32,6 +32,12 @@ GMs execute their own actions directly and can deposit from any sheet (including
 - **Add items from any source.** As GM, drag an item from the **Items sidebar** or a **compendium pack** onto the window. Since there's no owning character, nothing is removed — a copy is added to the pool, and you're asked how many. (Players can still only deposit from a character they own.)
 - **Mint coins with no source.** The currency bar has a GM-only "add coins (no source)" panel: enter gp/sp/cp and click **Add** to drop a hoard straight into the stash. Negative values subtract, so it doubles as a correction tool.
 
+## Chat cards
+
+Every move in the party loot gets a chat card in the Nimble style (the same cards Nimble Loot Actor posts): items and coins put in or taken out, coins spent (with the reason), and the GM's extras (adding items or coins from no source, corrections, clearing the ledger). Players speak as the character involved; when a GM acts, the party loot speaks.
+
+Each GM and player decides whether they want to see them: **Configure Settings → Nimble Party Loot → Show party loot in chat** is a per-user setting. Cards are still posted when you turn it off; they are only hidden on your screen.
+
 ## API for other modules
 
 `game.modules.get('nimble-party-loot').api` offers:
@@ -43,4 +49,4 @@ GMs execute their own actions directly and can deposit from any sheet (including
 | `addItem(itemOrUuid, { quantity, depositedBy })` | Add a copy of a Nimble object (a document or its uuid) to the stash. `quantity` defaults to the item's own quantity, `depositedBy` to the current user's name. Stackables merge as usual. Nothing is removed from the item's owner. |
 | `addCoins({ gp, sp, cp })` | Add coins to the stash. Missing or negative amounts count as zero. |
 
-`addItem` and `addCoins` must run on a GM client, since the stash is a world setting. Both resolve to `{ ok: true }` or `{ ok: false, error }`.
+`addItem` and `addCoins` must run on a GM client, since the stash is a world setting. Both resolve to `{ ok: true }` or `{ ok: false, error }`. They post no chat card, so the calling module can announce the move in its own words.

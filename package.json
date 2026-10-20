@@ -1,6 +1,6 @@
 {
 	"name": "nimble-party-loot",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"description": "Shared party loot stash for the Nimble 2 Foundry VTT system.",
 	"type": "module",
 	"private": true,

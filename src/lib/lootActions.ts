@@ -1,9 +1,12 @@
 import { requestTransaction } from '../socket/socket.js';
-import type { CoinPurse, LootEntry } from '../types.js';
+import type { TxResult } from '../socket/transactions.js';
+import type { CoinPurse, LootAction, LootEntry } from '../types.js';
+import { announce } from './chat.js';
 
-function notify(result: { ok: boolean; error?: string }, success: string): boolean {
+async function notify(action: LootAction, result: TxResult, success: string): Promise<boolean> {
 	if (result.ok) {
 		ui.notifications.info(success);
+		await announce(action, result.data);
 		return true;
 	}
 	ui.notifications.warn(result.error ?? 'The transfer could not be completed.');
@@ -21,12 +24,12 @@ export function coinString(coins: Partial<CoinPurse>): string {
 
 export async function depositItem(actorId: string, itemId: string, quantity: number) {
 	const result = await requestTransaction('depositItem', { actorId, itemId, quantity });
-	return notify(result, 'Item stashed in party loot.');
+	return notify('depositItem', result, 'Item stashed in party loot.');
 }
 
 export async function depositItemSource(uuid: string, quantity: number, name: string) {
 	const result = await requestTransaction('depositItemSource', { uuid, quantity });
-	return notify(result, `Added ${quantity}× ${name} to the stash.`);
+	return notify('depositItemSource', result, `Added ${quantity}× ${name} to the stash.`);
 }
 
 export async function withdrawItem(entry: LootEntry, actorId: string, quantity: number) {
@@ -35,30 +38,30 @@ export async function withdrawItem(entry: LootEntry, actorId: string, quantity: 
 		entryId: entry.entryId,
 		quantity,
 	});
-	return notify(result, `Took ${quantity}× ${entry.name}.`);
+	return notify('withdrawItem', result, `Took ${quantity}× ${entry.name}.`);
 }
 
 export async function depositCurrency(actorId: string, coins: CoinPurse) {
 	const result = await requestTransaction('depositCurrency', { actorId, ...coins });
-	return notify(result, `Deposited ${coinString(coins)}.`);
+	return notify('depositCurrency', result, `Deposited ${coinString(coins)}.`);
 }
 
 export async function withdrawCurrency(actorId: string, coins: CoinPurse) {
 	const result = await requestTransaction('withdrawCurrency', { actorId, ...coins });
-	return notify(result, `Withdrew ${coinString(coins)}.`);
+	return notify('withdrawCurrency', result, `Withdrew ${coinString(coins)}.`);
 }
 
 export async function spendCurrency(coins: CoinPurse, reason: string) {
 	const result = await requestTransaction('spendCurrency', { ...coins, reason });
-	return notify(result, `Spent ${coinString(coins)} on ${reason}.`);
+	return notify('spendCurrency', result, `Spent ${coinString(coins)} on ${reason}.`);
 }
 
 export async function adjustCurrency(deltas: { cp: number; sp: number; gp: number }) {
 	const result = await requestTransaction('adjustCurrency', deltas);
-	return notify(result, 'Stash coins updated.');
+	return notify('adjustCurrency', result, 'Stash coins updated.');
 }
 
 export async function clearLog() {
 	const result = await requestTransaction('clearLog', {});
-	return notify(result, 'Ledger cleared.');
+	return notify('clearLog', result, 'Ledger cleared.');
 }

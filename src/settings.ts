@@ -1,4 +1,5 @@
-import { MODULE_ID, SETTING_STORE } from './constants.js';
+import { MODULE_ID, SETTING_CHAT_CARDS, SETTING_STORE } from './constants.js';
+import { applyChatCardVisibility } from './lib/chat.js';
 import { lootStore } from './state/lootStore.svelte.js';
 import { EMPTY_STORE, type LootStore } from './types.js';
 
@@ -20,6 +21,18 @@ export function registerSettings(): void {
 		onChange: (value: LootStore) => {
 			lootStore.replace(normaliseStore(value));
 		},
+	});
+
+	// Client scope: every GM and player picks for themselves. Cards are always
+	// posted, so turning this off only hides them on this user's screen.
+	game.settings.register(MODULE_ID, SETTING_CHAT_CARDS, {
+		name: 'NIMBLE_PARTY_LOOT.settings.chatCards.name',
+		hint: 'NIMBLE_PARTY_LOOT.settings.chatCards.hint',
+		scope: 'client',
+		config: true,
+		type: Boolean,
+		default: true,
+		onChange: (value: boolean) => applyChatCardVisibility(value),
 	});
 }
 
