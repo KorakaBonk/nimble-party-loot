@@ -1,0 +1,45 @@
+{
+	"id": "nimble-party-loot",
+	"title": "Nimble Party Loot",
+	"description": "A shared party loot stash for the Nimble 2 system. Players drag items and coins out of their own inventory into a common pool, and anyone can take them back out — all transfers reconciled against each character's real inventory and purse.",
+	"version": "1.0.0",
+	"compatibility": {
+		"minimum": "14",
+		"verified": "14.365",
+		"maximum": "14"
+	},
+	"relationships": {
+		"systems": [
+			{
+				"id": "nimble",
+				"type": "system",
+				"compatibility": {
+					"minimum": "0.10.0",
+					"verified": "0.10.0"
+				}
+			}
+		]
+	},
+	"authors": [
+		{
+			"name": "KorakaBonk"
+		}
+	],
+	"esmodules": ["module.js"],
+	"styles": ["styles/party-loot.css"],
+	"languages": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json"
+		}
+	],
+	"socket": true,
+	"url": "https://github.com/KorakaBonk/nimble-party-loot",
+	"bugs": "https://github.com/KorakaBonk/nimble-party-loot/issues",
+	"readme": "https://github.com/KorakaBonk/nimble-party-loot/blob/main/README.md",
+	"changelog": "https://github.com/KorakaBonk/nimble-party-loot/blob/main/CHANGELOG.md",
+	"license": "LICENSE",
+	"manifest": "https://github.com/KorakaBonk/nimble-party-loot/releases/latest/download/module.json",
+	"download": "https://github.com/KorakaBonk/nimble-party-loot/releases/latest/download/module.zip"
+}
